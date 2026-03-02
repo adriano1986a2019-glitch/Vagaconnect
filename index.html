@@ -3,53 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vagaconnect | Entrevistas por Vídeo</title>
+    <title>Vagaconnect - Itapevi</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://meet.jit.si/external_api.js"></script>
-    <style>
-        .gradient-text { background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    </style>
 </head>
-<body class="bg-gray-50">
-    <nav class="p-6 bg-white shadow-sm flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-lg">VC</div>
-            <span class="text-2xl font-bold text-gray-900 italic">Vaga<span class="gradient-text">connect</span></span>
-        </div>
-        <button class="bg-indigo-600 text-white px-6 py-2 rounded-full font-medium shadow-md hover:bg-indigo-700 transition">Anunciar Vaga</button>
-    </nav>
+<body class="bg-slate-50 font-sans text-slate-900">
 
-    <header class="py-16 text-center px-4">
-        <h1 class="text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 italic">Contrate por <span class="gradient-text">Vídeo</span></h1>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto italic font-medium">Conectando empresas e talentos em tempo real em Itapevi e região.</p>
+    <header class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 text-white p-1.5 rounded-lg font-bold">VC</div>
+                <h1 class="text-xl font-bold italic tracking-tight">Vaga<span class="text-indigo-600">connect</span></h1>
+            </div>
+            <button onclick="document.getElementById('modalVaga').classList.remove('hidden')" class="bg-indigo-600 text-white px-5 py-2 rounded-full font-semibold shadow-sm hover:bg-indigo-700 transition">
+                Anunciar Vaga
+            </button>
+        </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-4 text-center">
-        <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-            <h2 class="text-2xl font-bold mb-6 italic text-gray-800 text-left border-b pb-2">Vagas Disponíveis</h2>
-            <div class="p-6 bg-indigo-50 rounded-2xl border border-indigo-100 flex flex-col md:flex-row justify-between items-center">
-                <div class="text-left mb-4 md:mb-0">
-                    <h3 class="text-xl font-bold text-indigo-900 italic">Auxiliar Administrativo</h3>
-                    <p class="text-gray-500 italic font-medium">Itapevi, SP</p>
-                </div>
-                <button onclick="startVideo()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg hover:bg-indigo-700 transition">
-                    <i class="fas fa-video"></i> Iniciar Entrevista Online
-                </button>
-            </div>
-            <div id="jitsi-container" class="mt-8 rounded-2xl overflow-hidden border-4 border-indigo-100 hidden" style="height: 500px;"></div>
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        <section class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold mb-4">Contrate por <span class="text-indigo-600">Vídeo</span></h2>
+            <p class="text-slate-600 text-lg">Conectando empresas e talentos em tempo real em Itapevi e região.</p>
+        </section>
+
+        <div class="grid gap-4" id="listaVagas">
+            <p class="text-center text-slate-500">Carregando vagas disponíveis...</p>
         </div>
     </main>
 
-    <script>
-        function startVideo() {
-            const container = document.getElementById('jitsi-container');
-            container.classList.remove('hidden');
-            new JitsiMeetExternalAPI('meet.jit.si', {
-                roomName: 'Vagaconnect-' + Math.floor(Math.random() * 10000),
-                width: '100%', height: 500, parentNode: container, lang: 'pt-br'
+    <div id="modalVaga" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[100] px-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <h3 class="text-xl font-bold mb-4 text-indigo-600">Anunciar Nova Vaga</h3>
+            <div class="space-y-4">
+                <input type="text" id="cargo" placeholder="Título da Vaga (Ex: Vendedor)" class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <input type="text" id="empresa" placeholder="Nome da sua Empresa" class="w-full border p-3 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                <button onclick="salvarVaga()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700">Publicar Vaga Agora</button>
+                <button onclick="document.getElementById('modalVaga').classList.add('hidden')" class="w-full text-slate-400 font-medium mt-2">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="videoContainer" class="fixed inset-0 bg-black hidden z-[200]">
+        <div id="meet" class="w-full h-full"></div>
+        <button onclick="encerrarChamada()" class="absolute bottom-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-8 py-3 rounded-full font-bold shadow-xl">Desligar Chamada</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Suas chaves configuradas
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSILgznRCJLE-EZ7RxsjjbnHQfsC9H8rY",
+            authDomain: "vagaconnect-54d2b.firebaseapp.com",
+            projectId: "vagaconnect-54d2b",
+            storageBucket: "vagaconnect-54d2b.firebasestorage.app",
+            messagingSenderId: "934959995751",
+            appId: "1:934959995751:web:f65ed838400a846ea82dc2",
+            measurementId: "G-Y9WPT2FS8N"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Função para o Anunciante salvar a vaga sozinha no Banco de Dados
+        window.salvarVaga = async () => {
+            const cargo = document.getElementById('cargo').value;
+            const empresa = document.getElementById('empresa').value;
+
+            if (cargo && empresa) {
+                try {
+                    await addDoc(collection(db, "vagas"), {
+                        cargo: cargo,
+                        empresa: empresa,
+                        data: new Date()
+                    });
+                    document.getElementById('modalVaga').classList.add('hidden');
+                    document.getElementById('cargo').value = '';
+                    document.getElementById('empresa').value = '';
+                    alert("Vaga publicada com sucesso!");
+                } catch (e) {
+                    alert("Erro ao publicar. Verifique as 'Regras' do Firestore no Firebase.");
+                }
+            } else {
+                alert("Preencha todos os campos!");
+            }
+        };
+
+        // Mostrar as vagas em tempo real para os candidatos
+        const q = query(collection(db, "vagas"), orderBy("data", "desc"));
+        onSnapshot(q, (snapshot) => {
+            const lista = document.getElementById('listaVagas');
+            lista.innerHTML = '';
+            snapshot.forEach((doc) => {
+                const vaga = doc.data();
+                lista.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-indigo-900">${vaga.cargo}</h4>
+                            <p class="text-slate-500 font-medium">${vaga.empresa} • Itapevi, SP</p>
+                        </div>
+                        <button onclick="iniciarChamada('${doc.id}')" class="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-indigo-700 transition">
+                            Entrar na Entrevista
+                        </button>
+                    </div>
+                `;
             });
-            container.scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+
+    <script>
+        let api = null;
+        function iniciarChamada(id) {
+            document.getElementById('videoContainer').classList.remove('hidden');
+            const domain = "meet.jit.si";
+            const options = {
+                roomName: "Vagaconnect_" + id,
+                parentNode: document.querySelector('#meet'),
+                lang: 'pt-br'
+            };
+            api = new JitsiMeetExternalAPI(domain, options);
+        }
+
+        function encerrarChamada() {
+            if (api) api.dispose();
+            document.getElementById('videoContainer').classList.add('hidden');
+            document.getElementById('meet').innerHTML = '';
         }
     </script>
 </body>
